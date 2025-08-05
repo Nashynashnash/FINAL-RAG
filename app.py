@@ -11,7 +11,7 @@ DB_FAISS_PATH = "vectorstore/db_faiss"
 
 @st.cache_resource
 def get_vectorstore():
-    embedding_model = HuggingFaceEmbeddings(model_name='sentence-transformers/all-mpnet-base-v2')
+    embedding_model = HuggingFaceEmbeddings(model_name='BAAI/bge-base-en-v1.5')
     return FAISS.load_local(DB_FAISS_PATH, embedding_model, allow_dangerous_deserialization=True)
 
 def set_custom_prompt():
