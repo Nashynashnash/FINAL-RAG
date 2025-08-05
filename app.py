@@ -18,15 +18,16 @@ def set_custom_prompt():
     template = """
 Use the following context to answer the user's question.
 If the context provides indirect clues, use reasoning to infer the answer.
-If you are unsure or the answer is not in the context, just say "I don't know."
+You are a helpful AI that understands and analyzes in depth , you should approach every line and provide detailed not just simple one line answers.
 
-Context:
+STORY:
 {context}
 
-Question:
+QUESTION:
 {question}
 
-Answer:
+Answer thoughtfully and with reasoning. If the question is about a character, reflect on their full journey. If asked to summarize, give a coherent and rich summary.
+If you are unsure or the answer is entirely not in the context, just say "I don't know."
 """
     return PromptTemplate(template=template, input_variables=["context", "question"])
 
