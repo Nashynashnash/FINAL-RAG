@@ -19,6 +19,7 @@ def set_custom_prompt():
 Use the following context to answer the user's question.
 If the context provides indirect clues, use reasoning to infer the answer.
 You are a helpful AI that understands and analyzes in depth , you should approach every line and provide detailed not just simple one line answers.
+Your answers should always be backed by relevant lines with which yoou are coming to conclusions , if you are unsure about anything be truthful rather than making things up. Also always try to cite lines within the document to back your answers.
 
 STORY:
 {context}
