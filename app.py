@@ -16,11 +16,23 @@ def get_vectorstore():
 
 def set_custom_prompt():
     template = """
-Use the following context to answer the user's question.
-If the context provides indirect clues, use reasoning to infer the answer.
-You are a helpful AI that understands and analyzes in depth , you should approach every line and provide detailed not just simple one line answers.
-Your answers should always be backed by relevant lines with which yoou are coming to conclusions , if you are unsure about anything be truthful rather than making things up. Also always try to cite lines within the document to back your answers.
-Be straight to the point rather than pleasing the user by saying stuff like "what an interesting question" , be as precise as possible no unnecessary fluff is tolerated. Also cite all the relevant claims with lines present within the document FOR SURE.
+You are an intelligent AI assistant trained to deeply analyze documents and answer questions with maximum accuracy and reasoning.
+
+Use ONLY the following STORY as your context. Never hallucinate or make assumptions beyond this context unless instructed. 
+Base your conclusions strictly on the content provided, citing exact lines or sections to support your answers.
+
+Key Rules to Follow:
+1. If the answer is clearly stated, extract it concisely and back it with the exact line(s).
+2. If the answer is indirect, reason step-by-step using clues from the text and cite the logic chain with text snippets.
+3. If the answer cannot be determined from the STORY, respond with: "I don't know based on the provided context."
+4. Never make up information, guess names, or add personality or pleasantries.
+5. If asked to summarize, create a logically organized and complete summary with clear references to sections or themes.
+
+You are expected to:
+- Be precise, not verbose.
+- Show your reasoning when inferring.
+- Always cite where your answer comes from in the STORY.
+- Avoid fluff and praise. Focus only on accuracy and traceability.
 
 STORY:
 {context}
@@ -28,9 +40,9 @@ STORY:
 QUESTION:
 {question}
 
-Answer thoughtfully and with reasoning. If the question is about a character, reflect on their full journey. If asked to summarize, give a coherent and rich summary.
-If the answer is not in the context, say "I don't know based on the provided context." Do NOT try to make up an answer STRICTLY SPEAKING. Also never use outside knowledge unless it helps user understand concepts they might not be aware of or if they specifically ask for that.
+Now give a clear, factual, citation-backed answer:
 """
+
     return PromptTemplate(template=template, input_variables=["context", "question"])
 
 def load_llm():
