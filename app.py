@@ -27,7 +27,7 @@ QUESTION:
 {question}
 
 Answer thoughtfully and with reasoning. If the question is about a character, reflect on their full journey. If asked to summarize, give a coherent and rich summary.
-If you are unsure or the answer is entirely not in the context, just say "I don't know."
+If the answer is not in the context, say "I don't know based on the provided context." Do NOT try to make up an answer STRICTLY SPEAKING. Also never use outside knowledge unless it helps user understand concepts they might not be aware of or if they specifically ask for that.
 """
     return PromptTemplate(template=template, input_variables=["context", "question"])
 
