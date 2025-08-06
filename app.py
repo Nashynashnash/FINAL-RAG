@@ -61,7 +61,7 @@ def main():
             qa_chain = RetrievalQA.from_chain_type(
                 llm=load_llm(),
                 chain_type="stuff",
-                retriever=vectorstore.as_retriever(search_kwargs={"k": 7}),
+                retriever=vectorstore.as_retriever(search_kwargs={"k": 5}),
                 return_source_documents=True,
                 chain_type_kwargs={"prompt": set_custom_prompt()}
             )
