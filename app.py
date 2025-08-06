@@ -16,34 +16,19 @@ def get_vectorstore():
 
 def set_custom_prompt():
     template = """
-You are an intelligent AI assistant trained to deeply analyze documents and answer questions with maximum accuracy and reasoning.
+You are an expert storyteller and summarizer. 
+Using the following context, write a **flowing, chronological summary** of the story. 
+Combine events smoothly, describe cause and effect, and explain how the story develops and ends. 
+Avoid quoting exact lines unless necessary for clarity. 
+Focus on the **progression** of the plot and the relationships between events.
 
-Use ONLY the following STORY as your context. Never hallucinate or make assumptions beyond this context unless instructed. 
-Base your conclusions strictly on the content provided, citing exact lines or sections to support your answers. Write a rich, connected summary of the events in the context below. 
-Describe how the story progresses and how it ends, combining all relevant details into a flowing narrative. 
-Avoid quoting line numbers or breaking it into fragments — instead, tell it like you are narrating the story to a friend.
-
-
-Key Rules to Follow:
-1. If the answer is clearly stated, extract it concisely and back it with the exact line(s).
-2. If the answer is indirect, reason step-by-step using clues from the text and cite the logic chain with text snippets.
-3. If the answer cannot be determined from the STORY, respond with: "I don't know based on the provided context."
-4. Never make up information, guess names, or add personality or pleasantries.
-5. If asked to summarize, create a logically organized and complete summary with clear references to sections or themes.
-
-You are expected to:
-- Be precise, not verbose.
-- Show your reasoning when inferring.
-- Always cite where your answer comes from in the STORY.
-- Avoid fluff and praise. Focus only on accuracy and traceability.
-
-STORY:
+Context:
 {context}
 
-QUESTION:
+Question:
 {question}
 
-Now give a clear, factual, citation-backed answer:
+Detailed Narrative:
 """
 
     return PromptTemplate(template=template, input_variables=["context", "question"])
