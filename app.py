@@ -16,11 +16,9 @@ def get_vectorstore():
 
 def set_custom_prompt():
     template = """
-You are an expert storyteller and summarizer. 
-Using the following context, write a **flowing, chronological summary** of the story. 
-Combine events smoothly, describe cause and effect, and explain how the story develops and ends. 
-Avoid quoting exact lines unless necessary for clarity. 
-Focus on the **progression** of the plot and the relationships between events.
+You are an expert in understanding tweets and reading between the lines. Read all the tweets and understand and find the context and connect the dots between Text and quoted text and summarize whenever asked.
+Respond to the question correctly but again never make up stories find and answer only which you completely understand. If you feel you will have to make up something to answer the user's question just say i dont know.
+Be as precise as possible and make sure you will be able toi summarize efficiently and correctly.
 
 Context:
 {context}
@@ -28,7 +26,7 @@ Context:
 Question:
 {question}
 
-Detailed Narrative:
+Do remember that you should answer with relevant references you can use URL for that. Whatever you are answering shuld be mentioned with relevant reference tweets with URL.
 """
 
     return PromptTemplate(template=template, input_variables=["context", "question"])
