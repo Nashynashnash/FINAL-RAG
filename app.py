@@ -3,7 +3,7 @@ import streamlit as st
 
 from langchain_community.vectorstores import FAISS
 from langchain.chains import RetrievalQA
-from langchain_core.prompts import PromptTemplate
+from langchain.prompts import PromptTemplate  # fixed import here
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_groq import ChatGroq
 
@@ -12,7 +12,9 @@ DB_FAISS_PATH = "vectorstore/db_faiss"
 @st.cache_resource
 def get_vectorstore():
     embedding_model = HuggingFaceEmbeddings(model_name='BAAI/bge-base-en-v1.5')
-    return FAISS.load_local(DB_FAISS_PATH, embedding_model, allow_dangerous_deserialization=True)
+    db = FAISS.load_local(DB_FAISS_PATH, embedding_model, allow_dangerous_deserialization=True)
+    print(f"Loaded vectorstore with {db.index.ntotal} vectors")
+    return db
 
 def set_custom_prompt():
     template = """
@@ -28,7 +30,6 @@ Question:
 
 Do remember that you should answer with relevant references you can use URL for that. Whatever you are answering shuld be mentioned with relevant reference tweets with URL.
 """
-
     return PromptTemplate(template=template, input_variables=["context", "question"])
 
 def load_llm():
@@ -55,32 +56,4 @@ def main():
         st.session_state.messages.append({"role": "user", "content": prompt})
 
         try:
-            vectorstore = get_vectorstore()
-            qa_chain = RetrievalQA.from_chain_type(
-                llm=load_llm(),
-                chain_type="stuff",
-                retriever=vectorstore.as_retriever(search_kwargs={"k": 20}),
-                return_source_documents=True,
-                chain_type_kwargs={"prompt": set_custom_prompt()}
-            )
-
-            response = qa_chain({"query": prompt})
-
-            result = response["result"]
-            sources = response.get("source_documents", [])
-
-            source_texts = "\n".join(f"• {doc.metadata.get('source', 'Unknown')}" for doc in sources)
-
-            final_output = f"{result}\n\n📄 **Sources:**\n{source_texts}"
-
-            st.chat_message("assistant").markdown(final_output)
-            st.session_state.messages.append({"role": "assistant", "content": final_output})
-
-        except Exception as e:
-            st.error(f"❌ Error: {e}")
-
-
-if __name__ == "__main__":
-    main()
-
-    
+            vectors
