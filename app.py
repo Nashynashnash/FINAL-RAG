@@ -1,26 +1,38 @@
 import os
 import streamlit as st
+import traceback
 
 from langchain_community.vectorstores import FAISS
 from langchain.chains import RetrievalQA
-from langchain.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_groq import ChatGroq
 
 DB_FAISS_PATH = "vectorstore/db_faiss"
 
 @st.cache_resource
+
+@st.cache_resource
 def get_vectorstore():
-    embedding_model = HuggingFaceEmbeddings(model_name='BAAI/bge-base-en-v1.5')
-    db = FAISS.load_local(DB_FAISS_PATH, embedding_model, allow_dangerous_deserialization=True)
-    print(f"Loaded vectorstore with {db.index.ntotal} vectors")
-    return db
+    embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")  # match indexing
+    return FAISS.load_local(DB_FAISS_PATH, embedding_model, allow_dangerous_deserialization=True)
+
+@st.cache_resource
+def get_llm():
+    groq_api_key = os.environ.get("GROQ_API_KEY")
+    if not groq_api_key:
+        raise ValueError("GROQ_API_KEY environment variable not set.")
+    return ChatGroq(
+        model_name="llama3-70b-8192",
+        temperature=0.0,
+        groq_api_key=groq_api_key
+    )
 
 def set_custom_prompt():
     template = """
-You are an expert in understanding tweets and reading between the lines. Read all the tweets and understand and find the context and connect the dots between Text and quoted text and summarize whenever asked.
-Respond to the question correctly but again never make up stories find and answer only which you completely understand. If you feel you will have to make up something to answer the user's question just say i dont know.
-Be as precise as possible and make sure you will be able toi summarize efficiently and correctly.
+Use the following context to answer the user's question.
+If the context provides indirect clues, use reasoning to infer the answer.
+If you are unsure or the answer is not in the context, just say "I don't know."
 
 Context:
 {context}
@@ -28,16 +40,9 @@ Context:
 Question:
 {question}
 
-Do remember that you should answer with relevant references you can use URL for that. Whatever you are answering shuld be mentioned with relevant reference tweets with URL.
+Answer:
 """
     return PromptTemplate(template=template, input_variables=["context", "question"])
-
-def load_llm():
-    return ChatGroq(
-        model_name="llama3-70b-8192",
-        temperature=0.0,
-        groq_api_key=st.secrets["GROQ_API_KEY"]
-    )
 
 def main():
     st.set_page_config(page_title="Ask Your Docs", layout="wide")
@@ -57,20 +62,19 @@ def main():
 
         try:
             vectorstore = get_vectorstore()
+            llm = get_llm()
             qa_chain = RetrievalQA.from_chain_type(
-                llm=load_llm(),
+                llm=llm,
                 chain_type="stuff",
-                retriever=vectorstore.as_retriever(search_kwargs={"k": 20}),
+                retriever=vectorstore.as_retriever(search_kwargs={"k": 3}),
                 return_source_documents=True,
                 chain_type_kwargs={"prompt": set_custom_prompt()}
             )
-
             response = qa_chain({"query": prompt})
 
             result = response["result"]
             sources = response.get("source_documents", [])
-
-            source_texts = "\n".join(f"• {doc.metadata.get('source', 'Unknown')}" for doc in sources)
+            source_texts = "\n".join(f"• {doc.metadata.get('source', 'Unknown')}" for doc in sources) if sources else "No sources found."
 
             final_output = f"{result}\n\n📄 **Sources:**\n{source_texts}"
 
@@ -79,6 +83,7 @@ def main():
 
         except Exception as e:
             st.error(f"❌ Error: {e}")
+            st.text(traceback.format_exc())
 
 if __name__ == "__main__":
     main()
