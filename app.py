@@ -3,7 +3,7 @@ import streamlit as st
 
 from langchain_community.vectorstores import FAISS
 from langchain.chains import RetrievalQA
-from langchain.prompts import PromptTemplate  # fixed import here
+from langchain.prompts import PromptTemplate
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_groq import ChatGroq
 
@@ -56,4 +56,29 @@ def main():
         st.session_state.messages.append({"role": "user", "content": prompt})
 
         try:
-            vectors
+            vectorstore = get_vectorstore()
+            qa_chain = RetrievalQA.from_chain_type(
+                llm=load_llm(),
+                chain_type="stuff",
+                retriever=vectorstore.as_retriever(search_kwargs={"k": 20}),
+                return_source_documents=True,
+                chain_type_kwargs={"prompt": set_custom_prompt()}
+            )
+
+            response = qa_chain({"query": prompt})
+
+            result = response["result"]
+            sources = response.get("source_documents", [])
+
+            source_texts = "\n".join(f"• {doc.metadata.get('source', 'Unknown')}" for doc in sources)
+
+            final_output = f"{result}\n\n📄 **Sources:**\n{source_texts}"
+
+            st.chat_message("assistant").markdown(final_output)
+            st.session_state.messages.append({"role": "assistant", "content": final_output})
+
+        except Exception as e:
+            st.error(f"❌ Error: {e}")
+
+if __name__ == "__main__":
+    main()
