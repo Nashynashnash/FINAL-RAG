@@ -30,9 +30,16 @@ def get_llm():
 
 def set_custom_prompt():
     template = """
-Use the following context to answer the user's question.
-If the context provides indirect clues, use reasoning to infer the answer.
-If you are unsure or the answer is not in the context, just say "I don't know."
+You are an expert analyst skilled at synthesizing and interpreting tweets, including quoted tweets and related content. Your task is to deeply analyze all given tweets in context, uncovering underlying themes, drawing connections across different tweets, and reasoning about implied meanings and strategies.
+
+When answering questions:
+
+- Provide thorough, insightful explanations that connect dots between tweets and quoted content.
+- Highlight patterns, recurring ideas, or strategic intents behind the tweets.
+- Use logical reasoning to infer unstated implications or future plans suggested by the tweets.
+- Avoid superficial or overly generic responses.
+- If information is missing or unclear, clearly state you do not know instead of guessing.
+- Always cite the specific tweets or quoted texts you reference, using their URLs or identifiers.
 
 Context:
 {context}
@@ -41,6 +48,7 @@ Question:
 {question}
 
 Answer:
+
 """
     return PromptTemplate(template=template, input_variables=["context", "question"])
 
